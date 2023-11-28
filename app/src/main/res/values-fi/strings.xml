@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Android-weather</string>
+    <string name="header">Sää</string>
+    <string name="cityName">Kaupunki</string>
+    <string name="settingsButtonText">Asetukset</string>
+</resources>
