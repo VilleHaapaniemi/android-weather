@@ -15,18 +15,21 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
 import java.util.Locale;
 
@@ -60,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             double longitude = currentLocation.getLongitude();
 
             // Round coordinates to 2 decimal precision
-            DecimalFormat df = new DecimalFormat("#.##");
+            DecimalFormat df = new DecimalFormat("#.##", new DecimalFormatSymbols(Locale.US)); // Use always . as decimal point
             latitude = Double.parseDouble(df.format(latitude));
             longitude = Double.parseDouble(df.format(longitude));
 
@@ -76,11 +79,9 @@ public class MainActivity extends AppCompatActivity {
                 double longitude = location.getLongitude();
 
                 // Round coordinates to 2 decimal precision
-                DecimalFormat df = new DecimalFormat("#.##");
+                DecimalFormat df = new DecimalFormat("#.##", new DecimalFormatSymbols(Locale.US)); // Use always . as decimal point
                 latitude = Double.parseDouble(df.format(latitude));
                 longitude = Double.parseDouble(df.format(longitude));
-
-                String cityName = getCityNameByCoordinates(latitude, longitude);
 
                 getWeatherData(latitude, longitude);
             }
@@ -103,7 +104,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void getWeatherData(double latitude, double longitude) {
         final String APIKEY = "642fe4b57dea28178ca8da02fab014f0";
-        String WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=" + APIKEY + "&units=metric";
+        Locale currentLocale = Locale.getDefault();
+        String languageCode = currentLocale.getLanguage();
+
+        String WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=" + APIKEY + "&units=metric" + "&lang=" + languageCode;
+
         StringRequest request = new StringRequest(Request.Method.GET, WEATHER_URL, response -> {
             try {
                 parseWeatherJsonAndUpdateUi(response);
@@ -122,16 +127,46 @@ public class MainActivity extends AppCompatActivity {
     private void parseWeatherJsonAndUpdateUi(String response) throws JSONException {
         try {
             JSONObject weatherJSON = new JSONObject(response);
-            String weather = weatherJSON.getJSONArray("weather").getJSONObject(0).getString("main");
-            double temperature = weatherJSON.getJSONObject("main").getDouble("temp");
-            double wind = weatherJSON.getJSONObject("wind").getDouble("speed");
-
-            TextView temperatureTextView = findViewById(R.id.temperatureTextView);
-            String temperatureText = String.format(temperature + " C");
-            temperatureTextView.setText(temperatureText);
+            updateUIWeather(weatherJSON);
         } catch (JSONException e ) {
             throw new JSONException(e);
         }
+    }
+
+    private void updateUIWeather(JSONObject weatherJSON) throws JSONException {
+        double latitude = weatherJSON.getJSONObject("coord").getDouble("lat");
+        double longitude = weatherJSON.getJSONObject("coord").getDouble("lon");
+        String cityName = getCityNameByCoordinates(latitude, longitude);
+        TextView cityNameTextView = findViewById(R.id.cityNameTextView);
+        cityNameTextView.setText(cityName);
+
+        String neighborhoodName = weatherJSON.getString("name");
+        TextView neighborhoodNameTextView = findViewById(R.id.neighborhoodNameTextView);
+        neighborhoodNameTextView.setText(neighborhoodName);
+
+        String weatherDescription = weatherJSON.getJSONArray("weather").getJSONObject(0).getString("description");
+        weatherDescription = weatherDescription.substring(0, 1).toUpperCase() + weatherDescription.substring(1);
+        TextView weatherDescriptionTextView = findViewById(R.id.weatherDescriptionTextView);
+        weatherDescriptionTextView.setText(weatherDescription);
+
+        double temperature = weatherJSON.getJSONObject("main").getDouble("temp");
+        TextView temperatureTextView = findViewById(R.id.temperatureTextView);
+        String temperatureText = String.format(temperature + " C");
+        temperatureTextView.setText(temperatureText);
+
+        double windSpeed = weatherJSON.getJSONObject("wind").getDouble("speed");
+        TextView windSpeedTextView = findViewById(R.id.windSpeedTextView);
+        String windSpeedText = String.format(windSpeed + " m/s");
+        windSpeedTextView.setText(windSpeedText);
+
+        String iconName = weatherJSON.getJSONArray("weather").getJSONObject(0).getString("icon");
+        setUIWeatherIcon(iconName);
+    }
+
+    private void setUIWeatherIcon(String iconName) {
+        String imageUri = "https://openweathermap.org/img/wn/" + iconName +"@2x.png";
+        ImageView weatherIcon = (ImageView) findViewById(R.id.weatherIconImageView);
+        Picasso.get().load(imageUri).into(weatherIcon);
     }
 
     @Override

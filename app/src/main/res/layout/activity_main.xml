@@ -48,16 +48,56 @@
 
     <TextView
         android:id="@+id/temperatureTextView"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
         android:text="@string/temperatureValue"
         android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/weatherIconImageView"
+        app:layout_constraintTop_toBottomOf="@+id/weatherDescriptionTextView" />
+
+    <ImageView
+        android:id="@+id/weatherIconImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/neighborhoodNameTextView"
+        app:srcCompat="?attr/selectableItemBackgroundBorderless" />
+
+    <TextView
+        android:id="@+id/weatherDescriptionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/weatherDescription"
+        android:textSize="24sp"
+        app:layout_constraintStart_toEndOf="@+id/weatherIconImageView"
+        app:layout_constraintTop_toBottomOf="@+id/neighborhoodNameTextView" />
+
+    <TextView
+        android:id="@+id/neighborhoodNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/neighborhoodName"
+        android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cityNameTextView" />
+
+    <TextView
+        android:id="@+id/windSpeedTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/windSpeed"
+        android:textSize="24sp"
+        app:layout_constraintStart_toEndOf="@+id/weatherIconImageView"
+        app:layout_constraintTop_toBottomOf="@+id/temperatureTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

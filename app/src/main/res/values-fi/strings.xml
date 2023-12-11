@@ -4,4 +4,8 @@
     <string name="header">Sää</string>
     <string name="cityName">Kaupunki</string>
     <string name="settingsButtonText">Asetukset</string>
+    <string name="weatherDescription">Kuvaus</string>
+    <string name="neighborhoodName">Kaupunginosa</string>
+    <string name="windSpeed">Tuulennopeus</string>
+    <string name="temperatureValue">Lämpötila</string>
 </resources>

@@ -2,6 +2,9 @@
     <string name="app_name">Android-weather</string>
     <string name="header">Weather</string>
     <string name="cityName">City</string>
-    <string name="temperatureValue" translatable="false">100 C</string>
+    <string name="temperatureValue">Temperature</string>
     <string name="settingsButtonText">Settings</string>
+    <string name="weatherDescription">Description</string>
+    <string name="neighborhoodName">Neighborhood</string>
+    <string name="windSpeed">Wind speed</string>
 </resources>
