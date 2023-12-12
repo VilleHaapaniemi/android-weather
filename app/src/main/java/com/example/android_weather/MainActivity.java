@@ -32,21 +32,32 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
     private LocationManager locationManager;
+    private String units;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Intent intent = getIntent();
+        String receivedUnit = intent.getStringExtra("UNITS");
+        if (receivedUnit == null) {
+            receivedUnit = "metric";
+        }
+        units = receivedUnit;
+
         startGPS();
         //getWeatherData(61.50, 23.76);
     }
 
     public void openSettings(View view) {
         Intent intent = new Intent(this, SettingsActivity.class);
+        intent.putExtra("UNITS", units);
         startActivity(intent);
     }
 
@@ -66,8 +77,6 @@ public class MainActivity extends AppCompatActivity {
             DecimalFormat df = new DecimalFormat("#.##", new DecimalFormatSymbols(Locale.US)); // Use always . as decimal point
             latitude = Double.parseDouble(df.format(latitude));
             longitude = Double.parseDouble(df.format(longitude));
-
-            String cityName = getCityNameByCoordinates(latitude, longitude);
 
             getWeatherData(latitude, longitude);
         }
@@ -107,7 +116,12 @@ public class MainActivity extends AppCompatActivity {
         Locale currentLocale = Locale.getDefault();
         String languageCode = currentLocale.getLanguage();
 
-        String WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&appid=" + APIKEY + "&units=metric" + "&lang=" + languageCode;
+        String WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather?" +
+                "lat=" + latitude +
+                "&lon=" + longitude +
+                "&appid=" + APIKEY +
+                "&units=" + units +
+                "&lang=" + languageCode;
 
         StringRequest request = new StringRequest(Request.Method.GET, WEATHER_URL, response -> {
             try {
@@ -149,14 +163,23 @@ public class MainActivity extends AppCompatActivity {
         TextView weatherDescriptionTextView = findViewById(R.id.weatherDescriptionTextView);
         weatherDescriptionTextView.setText(weatherDescription);
 
+        String temperatureUnit = "";
+        String speedUnit = "";
+        if (Objects.equals(units, "metric")) {
+            temperatureUnit = " C";
+            speedUnit = " m/s";
+        } else if (Objects.equals(units, "imperial")) {
+            temperatureUnit = " F";
+            speedUnit = " m/h";
+        }
         double temperature = weatherJSON.getJSONObject("main").getDouble("temp");
         TextView temperatureTextView = findViewById(R.id.temperatureTextView);
-        String temperatureText = String.format(temperature + " C");
+        String temperatureText = String.format(temperature + temperatureUnit);
         temperatureTextView.setText(temperatureText);
 
         double windSpeed = weatherJSON.getJSONObject("wind").getDouble("speed");
         TextView windSpeedTextView = findViewById(R.id.windSpeedTextView);
-        String windSpeedText = String.format(windSpeed + " m/s");
+        String windSpeedText = String.format(windSpeed + speedUnit);
         windSpeedTextView.setText(windSpeedText);
 
         String iconName = weatherJSON.getJSONArray("weather").getJSONObject(0).getString("icon");

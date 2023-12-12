@@ -8,4 +8,9 @@
     <string name="neighborhoodName">Kaupunginosa</string>
     <string name="windSpeed">Tuulennopeus</string>
     <string name="temperatureValue">Lämpötila</string>
+    <string name="settingsButton">Asetukset</string>
+    <string name="settingsHeader">Asetukset</string>
+    <string name="unitsRadioGroupTextView">Yksikkö</string>
+    <string name="saveSettingsButton">Tallenna</string>
+    <string name="metricsRadioButton">Metrinen</string>
 </resources>

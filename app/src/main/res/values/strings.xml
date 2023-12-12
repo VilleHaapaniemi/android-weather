@@ -7,4 +7,10 @@
     <string name="weatherDescription">Description</string>
     <string name="neighborhoodName">Neighborhood</string>
     <string name="windSpeed">Wind speed</string>
+    <string name="settingsButton">Settings</string>
+    <string name="settingsHeader">Settings</string>
+    <string name="metricsRadioButton">Metric</string>
+    <string name="imperialRadioButton" translatable="false">US</string>
+    <string name="unitsRadioGroupTextView">Units</string>
+    <string name="saveSettingsButton">Save</string>
 </resources>
