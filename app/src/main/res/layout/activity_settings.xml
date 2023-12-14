@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
-        android:text="Use GPS location"
+        android:text="@string/useGPSLocationTextView"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -106,7 +106,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="48dp"
-        android:text="City"
+        android:text="@string/cityInputLabel"
         android:textSize="24sp"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
@@ -119,8 +119,8 @@
         android:layout_marginTop="28dp"
         android:layout_marginEnd="32dp"
         android:checked="true"
-        android:text="Switch"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/unitsRadioGroup" />
+        app:layout_constraintTop_toBottomOf="@+id/unitsRadioGroup"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

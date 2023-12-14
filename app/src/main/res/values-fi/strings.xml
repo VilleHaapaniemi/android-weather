@@ -13,4 +13,6 @@
     <string name="unitsRadioGroupTextView">Yksikkö</string>
     <string name="saveSettingsButton">Tallenna</string>
     <string name="metricsRadioButton">Metrinen</string>
+    <string name="useGPSLocationTextView">Käytä GPS sijaintia</string>
+    <string name="cityInputLabel">Kaupunki</string>
 </resources>

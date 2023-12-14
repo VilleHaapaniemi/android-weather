@@ -13,4 +13,6 @@
     <string name="imperialRadioButton" translatable="false">US</string>
     <string name="unitsRadioGroupTextView">Units</string>
     <string name="saveSettingsButton">Save</string>
+    <string name="useGPSLocationTextView">Use GPS location</string>
+    <string name="cityInputLabel">City</string>
 </resources>
