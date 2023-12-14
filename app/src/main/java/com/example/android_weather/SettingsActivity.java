@@ -36,8 +36,6 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         setCurrentUnitRadioGroup();
-        //setUnitsRadioGroupListener();
-
         initializeGPSLocationSwitch();
     }
 

@@ -7,6 +7,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -51,11 +52,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getIntent();
         getIntentData(intent);
         if (IsGPSLocationEnabled) {
-            startGPS();
+            startGPS(); // Fetch weather using GPS latitude and longitude
+        } else {
+            getWeatherData(); // Fetch weather using user given city name
         }
-        getWeatherData();
-
-        //getWeatherData(61.50, 23.76);
     }
 
     private void getIntentData(Intent intent) {
@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
             DecimalFormat df = new DecimalFormat("#.##", new DecimalFormatSymbols(Locale.US)); // Use always . as decimal point
             latitude = Double.parseDouble(df.format(latitudeResult));
             longitude = Double.parseDouble(df.format(longitudeResult));
+            getWeatherData();
         }
 
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 1000, new LocationListener() {
