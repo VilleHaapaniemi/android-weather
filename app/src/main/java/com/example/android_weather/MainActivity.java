@@ -52,9 +52,8 @@ public class MainActivity extends AppCompatActivity {
         getIntentData(intent);
         if (IsGPSLocationEnabled) {
             startGPS();
-        } else {
-            getWeatherData();
         }
+        getWeatherData();
 
         //getWeatherData(61.50, 23.76);
     }
@@ -226,6 +225,10 @@ public class MainActivity extends AppCompatActivity {
     public void openSettings(View view) {
         Intent intent = new Intent(this, SettingsActivity.class);
         intent.putExtra("UNITS", units);
+        intent.putExtra("GPS_LOCATION_ENABLED", IsGPSLocationEnabled);
+        if (!IsGPSLocationEnabled) {
+            intent.putExtra("CITY_NAME_INPUT", cityNameInput);
+        }
         startActivity(intent);
     }
 

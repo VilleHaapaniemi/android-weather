@@ -30,13 +30,18 @@ public class SettingsActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         units = intent.getStringExtra("UNITS");
-        setCurrentUnitRadioGroup();
+        IsGPSLocationEnabled = intent.getBooleanExtra("GPS_LOCATION_ENABLED", true);
+        if (!IsGPSLocationEnabled) {
+            cityNameInput = intent.getStringExtra("CITY_NAME_INPUT");
+        }
 
-        setUnitsRadioGroupListener();
-        listenGPSLocationSwitchState();
+        setCurrentUnitRadioGroup();
+        //setUnitsRadioGroupListener();
+
+        initializeGPSLocationSwitch();
     }
 
-    public void setCurrentUnitRadioGroup() {
+    private void setCurrentUnitRadioGroup() {
         int currentUnitButtonId = 0;
         if (Objects.equals(units, "metric")) {
             currentUnitButtonId = R.id.metricsRadioButton;
@@ -48,10 +53,12 @@ public class SettingsActivity extends AppCompatActivity {
         if (currentUnitButtonId != 0) {
             unitsRadioGroup.check(currentUnitButtonId);
         }
+
+        setUnitsRadioGroupListener(unitsRadioGroup);
     }
 
-    public void setUnitsRadioGroupListener() {
-        RadioGroup radioGroup = findViewById(R.id.unitsRadioGroup);
+    private void setUnitsRadioGroupListener(RadioGroup radioGroup) {
+        radioGroup = findViewById(R.id.unitsRadioGroup);
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.metricsRadioButton) {
                 units = "metric";
@@ -61,22 +68,36 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
-    public void listenGPSLocationSwitchState() {
-        Switch useGPSLocationSwitch = findViewById(R.id.useGPSLocationSwitch);
+    private void initializeGPSLocationSwitch() {
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch useGPSLocationSwitch = findViewById(R.id.useGPSLocationSwitch);
+        useGPSLocationSwitch.setChecked(IsGPSLocationEnabled);
+        setCityInputLayoutVisibility(IsGPSLocationEnabled);
+        listenGPSLocationSwitchState(useGPSLocationSwitch);
+    }
 
+    private void listenGPSLocationSwitchState(@SuppressLint("UseSwitchCompatOrMaterialCode") Switch useGPSLocationSwitch) {
+        useGPSLocationSwitch = findViewById(R.id.useGPSLocationSwitch);
         useGPSLocationSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            TextView cityInputTextView = findViewById(R.id.cityInputTextView);
-            TextInputLayout cityTextInputLayout = findViewById(R.id.cityTextInputLayout);
-            if (!isChecked) {
-                IsGPSLocationEnabled = false;
-                cityInputTextView.setVisibility(View.VISIBLE);
-                cityTextInputLayout.setVisibility(View.VISIBLE);
-            } else {
-                IsGPSLocationEnabled = true;
-                cityInputTextView.setVisibility(View.GONE);
-                cityTextInputLayout.setVisibility(View.GONE);
-            }
+            setCityInputLayoutVisibility(isChecked);
         });
+    }
+
+    private void setCityInputLayoutVisibility(boolean isChecked) {
+        TextView cityInputTextView = findViewById(R.id.cityInputTextView);
+        TextInputLayout cityTextInputLayout = findViewById(R.id.cityTextInputLayout);
+        if (!isChecked) {
+            IsGPSLocationEnabled = false;
+            cityInputTextView.setVisibility(View.VISIBLE);
+            cityTextInputLayout.setVisibility(View.VISIBLE);
+            if (cityNameInput != null) {
+                TextInputEditText cityNameInputTextEdit = findViewById(R.id.cityNameInputTextEdit);
+                cityNameInputTextEdit.setText(cityNameInput);
+            }
+        } else {
+            IsGPSLocationEnabled = true;
+            cityInputTextView.setVisibility(View.GONE);
+            cityTextInputLayout.setVisibility(View.GONE);
+        }
     }
 
     private void setCityNameInput() {
