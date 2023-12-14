@@ -38,6 +38,10 @@ public class MainActivity extends AppCompatActivity {
 
     private LocationManager locationManager;
     private String units;
+    private boolean IsGPSLocationEnabled = true;
+    private String cityNameInput;
+    private double latitude;
+    private double longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,20 +49,27 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Intent intent = getIntent();
+        getIntentData(intent);
+        if (IsGPSLocationEnabled) {
+            startGPS();
+        } else {
+            getWeatherData();
+        }
+
+        //getWeatherData(61.50, 23.76);
+    }
+
+    private void getIntentData(Intent intent) {
         String receivedUnit = intent.getStringExtra("UNITS");
         if (receivedUnit == null) {
             receivedUnit = "metric";
         }
         units = receivedUnit;
 
-        startGPS();
-        //getWeatherData(61.50, 23.76);
-    }
-
-    public void openSettings(View view) {
-        Intent intent = new Intent(this, SettingsActivity.class);
-        intent.putExtra("UNITS", units);
-        startActivity(intent);
+        IsGPSLocationEnabled = intent.getBooleanExtra("GPS_LOCATION_ENABLED", true);
+        if (!IsGPSLocationEnabled) {
+            cityNameInput = intent.getStringExtra("CITY_NAME_INPUT");
+        }
     }
 
     public void startGPS() {
@@ -70,59 +81,33 @@ public class MainActivity extends AppCompatActivity {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Location currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (currentLocation != null) {
-            double latitude = currentLocation.getLatitude();
-            double longitude = currentLocation.getLongitude();
+            double latitudeResult = currentLocation.getLatitude();
+            double longitudeResult = currentLocation.getLongitude();
 
             // Round coordinates to 2 decimal precision
             DecimalFormat df = new DecimalFormat("#.##", new DecimalFormatSymbols(Locale.US)); // Use always . as decimal point
-            latitude = Double.parseDouble(df.format(latitude));
-            longitude = Double.parseDouble(df.format(longitude));
-
-            getWeatherData(latitude, longitude);
+            latitude = Double.parseDouble(df.format(latitudeResult));
+            longitude = Double.parseDouble(df.format(longitudeResult));
         }
 
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 1000, new LocationListener() {
             @Override
             public void onLocationChanged(@NonNull Location location) {
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
+                double latitudeResult = location.getLatitude();
+                double longitudeResult = location.getLongitude();
 
                 // Round coordinates to 2 decimal precision
                 DecimalFormat df = new DecimalFormat("#.##", new DecimalFormatSymbols(Locale.US)); // Use always . as decimal point
-                latitude = Double.parseDouble(df.format(latitude));
-                longitude = Double.parseDouble(df.format(longitude));
+                latitude = Double.parseDouble(df.format(latitudeResult));
+                longitude = Double.parseDouble(df.format(longitudeResult));
 
-                getWeatherData(latitude, longitude);
+                getWeatherData();
             }
         });
     }
 
-    private String getCityNameByCoordinates(double latitude, double longitude) {
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        try {
-            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-            if (addresses != null && !addresses.isEmpty()) {
-                Address address = addresses.get(0);
-                return address.getLocality();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public void getWeatherData(double latitude, double longitude) {
-        final String APIKEY = "642fe4b57dea28178ca8da02fab014f0";
-        Locale currentLocale = Locale.getDefault();
-        String languageCode = currentLocale.getLanguage();
-
-        String WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather?" +
-                "lat=" + latitude +
-                "&lon=" + longitude +
-                "&appid=" + APIKEY +
-                "&units=" + units +
-                "&lang=" + languageCode;
-
+    public void getWeatherData() {
+        String WEATHER_URL = createAPIWeatherURL();
         StringRequest request = new StringRequest(Request.Method.GET, WEATHER_URL, response -> {
             try {
                 parseWeatherJsonAndUpdateUi(response);
@@ -136,6 +121,29 @@ public class MainActivity extends AppCompatActivity {
             });
         });
         Volley.newRequestQueue(this).add(request);
+    }
+
+    private String createAPIWeatherURL() {
+        String weatherURL;
+        final String APIKEY = "642fe4b57dea28178ca8da02fab014f0";
+        Locale currentLocale = Locale.getDefault();
+        String languageCode = currentLocale.getLanguage();
+
+        if (IsGPSLocationEnabled) {
+            weatherURL = "https://api.openweathermap.org/data/2.5/weather?" +
+                    "lat=" + latitude +
+                    "&lon=" + longitude +
+                    "&appid=" + APIKEY +
+                    "&units=" + units +
+                    "&lang=" + languageCode;
+        } else {
+            weatherURL = "https://api.openweathermap.org/data/2.5/weather?" +
+                    "q=" + cityNameInput +
+                    "&appid=" + APIKEY +
+                    "&units=" + units +
+                    "&lang=" + languageCode;
+        }
+        return weatherURL;
     }
 
     private void parseWeatherJsonAndUpdateUi(String response) throws JSONException {
@@ -186,10 +194,30 @@ public class MainActivity extends AppCompatActivity {
         setUIWeatherIcon(iconName);
     }
 
+    private String getCityNameByCoordinates(double latitude, double longitude) {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                return address.getLocality();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private void setUIWeatherIcon(String iconName) {
         String imageUri = "https://openweathermap.org/img/wn/" + iconName +"@2x.png";
         ImageView weatherIcon = (ImageView) findViewById(R.id.weatherIconImageView);
         Picasso.get().load(imageUri).into(weatherIcon);
+    }
+
+    public void openSettings(View view) {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        intent.putExtra("UNITS", units);
+        startActivity(intent);
     }
 
     @Override
