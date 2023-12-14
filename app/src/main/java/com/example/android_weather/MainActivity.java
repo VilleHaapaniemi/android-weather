@@ -116,8 +116,17 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }, error -> {
+            String errorMessageResult = new String(error.networkResponse.data);
+            JSONObject errorJson;
+            String errorMessage;
+            try {
+                errorJson = new JSONObject(errorMessageResult);
+                errorMessage = errorJson.getString("message");
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
             runOnUiThread(() -> {
-                Toast.makeText(this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
             });
         });
         Volley.newRequestQueue(this).add(request);
